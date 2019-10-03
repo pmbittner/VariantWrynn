@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.tubs</groupId>
+    <artifactId>variantwrynn</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.ovgu</groupId>
+            <artifactId>featureide.lib.fm.core</artifactId>
+            <version>3.5.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/featureide3_5_5/de.ovgu.featureide.lib.fm-v3.5.5.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.sat4j</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/featureide3_5_5/org.sat4j.core.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.sat4j</groupId>
+            <artifactId>pb</artifactId>
+            <version>3.5.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/featureide3_5_5/org.sat4j.pb.jar</systemPath>
+        </dependency>
+    </dependencies>
+</project>
