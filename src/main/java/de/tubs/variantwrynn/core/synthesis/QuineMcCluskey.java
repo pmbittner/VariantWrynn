@@ -1,9 +1,12 @@
-package de.tubs.variantwrynn.core.mining;
+package de.tubs.variantwrynn.core.synthesis;
+
+import de.tubs.variantwrynn.util.Yield;
+import org.prop4j.Node;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 
-public class QuineMcCluskey {
+public class QuineMcCluskey implements PropositionalFormulaSynthesiser {
     public static class AssignmentTable {
         private final int numVars;
 
@@ -25,5 +28,10 @@ public class QuineMcCluskey {
         public void addAssignment() {
 
         }
+    }
+
+    @Override
+    public Yield<Node> synthesise() {
+        return null;
     }
 }
