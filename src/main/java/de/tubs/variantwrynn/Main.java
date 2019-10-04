@@ -17,11 +17,15 @@ import java.util.function.BiConsumer;
 public class Main {
     public static String DefaultResourceDirectory = "src/main/resources";
 
+    /**
+     * Represents artefacts with a feature mapping formula.
+     * We use this to represent ground truth data for tests and evaluation.
+     */
     private static class MappedArtefact {
         Node mapping;
         Artefact artefact;
 
-        public MappedArtefact(Node mapping, Artefact artefact) {
+        MappedArtefact(Node mapping, Artefact artefact) {
             this.mapping = mapping;
             this.artefact = artefact;
         }
@@ -75,7 +79,7 @@ public class Main {
 
             variants.get(4).select(fName_Mem);
 
-            // Add artefacts to all variants whose confgurations satisfy the artefacts mapping
+            // Add each artefact to all variants whose confguration satisfies the artefacts mapping.
             for (MappedArtefact ma : A) {
                 for (ListVariant v : variants) {
                     if (v.configurationSatisfies(ma.mapping)) {
@@ -92,6 +96,7 @@ public class Main {
         SimpleVariantSyncProject vs = createTestScenario();
 
         vs.print();
+
         System.out.println("\n========== Recommendations =============================================================\n");
 
         /// And now derive the feature mappings
