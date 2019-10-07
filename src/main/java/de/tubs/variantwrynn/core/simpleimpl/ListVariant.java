@@ -42,21 +42,6 @@ public class ListVariant implements Variant {
         return config;
     }
 
-    @Override
-    public boolean configurationSatisfies(Node formula) {
-        Map<Object, Boolean> assignment = new HashMap<>();
-
-        for (IFeature f : config.getFeatureModel().getFeatures()) {
-            assignment.put(f.getName(), false);
-        }
-
-        for (IFeature f : config.getSelectedFeatures()) {
-            assignment.put(f.getName(), true);
-        }
-
-        return formula.getValue(assignment);
-    }
-
     public List<Artefact> getArtefacts() {
         return artefacts;
     }

@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 public class Main {
-    public static String DefaultResourceDirectory = "src/main/resources";
+    private static String DefaultResourceDirectory = "src/main/resources";
 
     /**
      * Represents artefacts with a feature mapping formula.
@@ -103,7 +103,7 @@ public class Main {
         VariantWrynn variantWrynn = new VariantWrynn(vs);
 
         /// 1.) Get all artefacts A
-        /// So far we only contain exact equality (similarity = 1). Hence, represent A as a set to avoid duplicates.
+        /// So far we only consider exact equality (similarity = 1). Hence, represent A as a set to avoid duplicates.
         Set<Artefact> A = new HashSet<>();
         for (ListVariant v : vs.getVariants()) {
             A.addAll(v.getArtefacts());
