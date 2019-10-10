@@ -1,8 +1,14 @@
 package de.tubs.variantwrynn.core.mining;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.tubs.variantwrynn.core.model.Artefact;
 import de.tubs.variantwrynn.core.model.Variant;
 import de.tubs.variantwrynn.core.model.VariantSyncProject;
+import de.tubs.variantwrynn.core.synthesis.quinemccluskey.QuineMcCluskey;
+import de.tubs.variantwrynn.util.Bits;
+import de.tubs.variantwrynn.util.Yield;
+import de.tubs.variantwrynn.util.fide.ConfigurationUtils;
 import org.prop4j.Node;
 
 import java.util.ArrayList;
@@ -15,17 +21,24 @@ public class VariantWrynn {
         this.vsProject = vsProject;
     }
 
-    public List<Node> recommendFeatureMappingFor(Artefact a) {
-        List<Node> recommendations = new ArrayList<>();
+    public Yield<Node> recommendFeatureMappingFor(Artefact a) {
+        final IFeatureModel fm = vsProject.getFeatureModel();
+        final List<IFeature> featureOrder = new ArrayList<>(fm.getNumberOfFeatures());
+        for (String fName : fm.getFeatureOrderList()) {
+            featureOrder.add(fm.getFeature(fName));
+        }
 
-        List<Variant> v_top = new ArrayList<>();
-        List<Variant> v_bot = new ArrayList<>();
+        List<Bits> v_top = new ArrayList<>();
+        List<Bits> v_bot = new ArrayList<>();
+        List<Bits> v_dc  = new ArrayList<>();
 
         for (Variant v : vsProject.getVariants()) {
+            Bits c = ConfigurationUtils.toAssignment(v.getConfiguration(), featureOrder);
+
             if (v.contains(a)) {
-                v_top.add(v);
+                v_top.add(c);
             } else {
-                v_bot.add(v);
+                v_bot.add(c);
             }
         }
 
@@ -35,9 +48,6 @@ public class VariantWrynn {
         // We need them for the derivation with the Quine-McCluskey algorithm in the next step.
         // Maybe, bitsets suffice.
 
-
-
-
-        return recommendations;
+        return new QuineMcCluskey().synthesise(v_top, v_bot, v_dc);
     }
 }

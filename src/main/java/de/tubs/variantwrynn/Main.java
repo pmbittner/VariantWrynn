@@ -1,11 +1,12 @@
 package de.tubs.variantwrynn;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.tubs.variantwrynn.core.mining.VariantWrynn;
 import de.tubs.variantwrynn.core.model.Artefact;
 import de.tubs.variantwrynn.core.simpleimpl.ListVariant;
 import de.tubs.variantwrynn.core.simpleimpl.OrthogonalStringArtefact;
 import de.tubs.variantwrynn.core.simpleimpl.SimpleVariantSyncProject;
+import de.tubs.variantwrynn.core.synthesis.quinemccluskey.QuineMcCluskey;
+import de.tubs.variantwrynn.util.Bits;
 import de.tubs.variantwrynn.util.fide.IO;
 import de.tubs.variantwrynn.util.fide.NodeUtils;
 import org.prop4j.And;
@@ -92,7 +93,48 @@ public class Main {
         return new SimpleVariantSyncProject(globalFM, variants);
     }
 
+    private static void QuineMcCluskeyTest() {
+        QuineMcCluskey qmc = new QuineMcCluskey();
+        List<Bits> satisfyingAssignments =
+                Bits.fromDecimals(4,1, 3, 6, 11, 13);
+        List<Bits> dontcareAssignments =
+                Bits.fromDecimals(4,2, 7, 15);
+
+        System.out.println("Satisfying Assignments:");
+        for (Bits b : satisfyingAssignments) {
+            System.out.println("  " + b);
+        }
+
+        satisfyingAssignments.get(0).xor(satisfyingAssignments.get(2));
+
+        System.out.println("Satisfying Assignments:");
+        for (Bits b : satisfyingAssignments) {
+            System.out.println("  " + b);
+        }
+
+        /*
+        System.out.println("Don't-Care Assignments:");
+        for (BitSet b : dontcareAssignments) {
+            System.out.println("  " + BitSetUtils.toBitString(b));
+        }//*/
+
+        /*
+        for (Node recommendation : qmc.synthesise(satisfyingAssignments, null, dontcareAssignments)) {
+            System.out.println("  " + recommendation);
+        }//*/
+    }
+
+    private static void BitsTest() {
+        Bits b = new Bits(4, 2);
+        System.out.println(b);
+        System.out.println(b.toBigInt());
+    }
+
     public static void main(String[] args) {
+//*
+        System.out.println("\n========== Quine-McCluskey Algorithm Test ==============================================\n");
+        BitsTest();//QuineMcCluskeyTest();
+/*/
         SimpleVariantSyncProject vs = createTestScenario();
 
         vs.print();
@@ -113,10 +155,10 @@ public class Main {
         for (Artefact a : A) {
             System.out.println("VariantWrynn[\"" + a + "\"] recommends:");
 
-            List<Node> recommendations = variantWrynn.recommendFeatureMappingFor(a);
-            for (Node recommendation : recommendations) {
+            for (Node recommendation : variantWrynn.recommendFeatureMappingFor(a)) {
                 System.out.println("  " + recommendation);
             }
         }
+//*/
     }
 }

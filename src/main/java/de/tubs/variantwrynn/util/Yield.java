@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.function.Supplier;
 import java.util.function.BooleanSupplier;
 
-public class Yield<T> implements Iterator<T> {
+public class Yield<T> implements Iterable<T>, Iterator<T> {
     private Supplier<T> getNext;
     private BooleanSupplier hasNext;
 
@@ -21,5 +21,10 @@ public class Yield<T> implements Iterator<T> {
     @Override
     public T next() {
         return getNext.get();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return this;
     }
 }
