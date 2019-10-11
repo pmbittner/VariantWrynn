@@ -36,21 +36,37 @@ public class Bits {
     public static List<Bits> fromDecimals(int numBits, int... num) {
         List<Bits> bits = new ArrayList<>(numBits);
 
-        for (int i = 0; i < num.length; ++i) {
-            bits.add(new Bits(numBits, num[i]));
+        for (int value : num) {
+            bits.add(new Bits(numBits, value));
         }
 
         return bits;
     }
 
-    public boolean get(int i) {
-        int wi = wordIndexOfGlobalIndex(i);
-        int li = i - wi;
-        return ((words[wi] >> li) & 1) == 1;
+    public boolean getBit(int index) {
+        final int w = wordIndexOfGlobalIndex(index);
+        final int localIndex = index - w;
+        return ((words[w] >>> localIndex) & 1) == 1;
     }
 
-    public void set(int index, boolean value) {
+    public void setBit(int index) {
+        final int w = wordIndexOfGlobalIndex(index);
+        final int localIndex = index - w;
+        words[w] |= 1 << localIndex;
+    }
 
+    public void clearBit(int index) {
+        final int w = wordIndexOfGlobalIndex(index);
+        final int localIndex = index - w;
+        words[w] &= ~(1 << localIndex);
+    }
+
+    public void setBitTo(int index, boolean value) {
+        if (value) {
+            setBit(index);
+        } else {
+            clearBit(index);
+        }
     }
 
     public Bits inlineAnd(Bits other) {
@@ -98,12 +114,14 @@ public class Bits {
         return res.inlineXor(other);
     }
 
-    public void cleanExtraBits() {
+    private void cleanExtraBits() {
         final int localIndex = numBits - (words.length - 1) * WordSize;
+
+        // TODO: Can we make mask creation more efficient?
         long mask = 0;
         for (int i = 0; i < localIndex; ++i) {
-            mask += 1;
             mask <<= 1;
+            mask += 1;
         }
 
         words[words.length - 1] &= mask;
@@ -118,7 +136,15 @@ public class Bits {
     }
 
     public int cardinality() {
-        return 0;
+        cleanExtraBits();
+
+        int cardi = 0;
+
+        for (long word : words) {
+            cardi += Long.bitCount(word);
+        }
+
+        return cardi;
     }
 
     public BigInteger toBigInt() {
@@ -146,6 +172,6 @@ public class Bits {
             }
         }
 
-        return sb.toString();
+        return sb.reverse().toString();
     }
 }

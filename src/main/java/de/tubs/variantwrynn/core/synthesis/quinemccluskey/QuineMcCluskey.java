@@ -53,7 +53,11 @@ public class QuineMcCluskey implements PropositionalFormulaSynthesiser {
         }
 
         for (int iteration = 0; iteration < tables.size(); ++iteration) {
+
+            System.out.println("\n==== [TABLE " + iteration + "] =================");
             tables.get(iteration).print();
+            System.out.println("================================");
+
             AssignmentTable nextTable = tables.get(iteration).mergeIntoNextTable();
             if (!nextTable.isEmpty()) {
                 tables.add(nextTable);
@@ -108,9 +112,9 @@ public class QuineMcCluskey implements PropositionalFormulaSynthesiser {
          *
          * return toNodes(implikanten);
          */
-        return new Yield<Node>(
-                () -> {return false;},
-                () -> {return null;}
+        return new Yield<>(
+                () -> false,
+                () -> null
         );
     }
 }

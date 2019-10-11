@@ -100,40 +100,63 @@ public class Main {
         List<Bits> dontcareAssignments =
                 Bits.fromDecimals(4,2, 7, 15);
 
-        System.out.println("Satisfying Assignments:");
-        for (Bits b : satisfyingAssignments) {
-            System.out.println("  " + b);
-        }
-
-        satisfyingAssignments.get(0).xor(satisfyingAssignments.get(2));
-
-        System.out.println("Satisfying Assignments:");
-        for (Bits b : satisfyingAssignments) {
-            System.out.println("  " + b);
-        }
-
         /*
+        System.out.println("Satisfying Assignments:");
+        for (Bits b : satisfyingAssignments) {
+            System.out.println("  " + b);
+        }
+
+        //*
         System.out.println("Don't-Care Assignments:");
-        for (BitSet b : dontcareAssignments) {
-            System.out.println("  " + BitSetUtils.toBitString(b));
+        for (Bits b : dontcareAssignments) {
+            System.out.println("  " + b);
         }//*/
 
-        /*
+        //*
         for (Node recommendation : qmc.synthesise(satisfyingAssignments, null, dontcareAssignments)) {
             System.out.println("  " + recommendation);
         }//*/
     }
 
     private static void BitsTest() {
-        Bits b = new Bits(4, 2);
+        final int numBits = 9;
+        final int inDecimal = 1 + 2 + 4 + 128 + 256;
+
+        Bits b = new Bits(numBits, inDecimal);
+        System.out.println("Dec = " + inDecimal);
+        System.out.println("Bin = " + b);
+        System.out.println("    = " + b.toBigInt());
+        System.out.println("Crd = " + b.cardinality());
+
+        Bits other = new Bits(numBits, 1 + 8);
+        System.out.println("\n  " + b);
+        System.out.println(  "& " + other);
+        System.out.println(  "-----------");
+        System.out.println(  "= " + b.and(other));
+
+        System.out.println("\n  " + b);
+        System.out.println(  "| " + other);
+        System.out.println(  "-----------");
+        System.out.println(  "= " + b.or(other));
+
+        System.out.println("\n  " + b);
+        System.out.println(  "& " + other);
+        System.out.println(  "-----------");
+        System.out.println(  "^ " + b.xor(other));
+
+        int setBit = 4;
+        System.out.print("\nSet bit " + setBit + ": ");
+        b.setBitTo(setBit, true);
         System.out.println(b);
-        System.out.println(b.toBigInt());
+        System.out.print("Clr bit " + setBit + ": ");
+        b.setBitTo(setBit, false);
+        System.out.println(b);
     }
 
     public static void main(String[] args) {
 //*
         System.out.println("\n========== Quine-McCluskey Algorithm Test ==============================================\n");
-        BitsTest();//QuineMcCluskeyTest();
+        QuineMcCluskeyTest();
 /*/
         SimpleVariantSyncProject vs = createTestScenario();
 

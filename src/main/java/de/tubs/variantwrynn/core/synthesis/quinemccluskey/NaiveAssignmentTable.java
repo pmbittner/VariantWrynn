@@ -33,7 +33,7 @@ public class NaiveAssignmentTable implements AssignmentTable {
             this.assignment = b.assignment.and(a.assignment);
 
             // b.dashes would also be correct
-            this.dashes = a.dashes.or(a.assignment.xor(b.assignment));
+            this.dashes = a.assignment.xor(b.assignment).inlineOr(a.dashes);
 
             this.lines = new ArrayList<>(a.lines.size() + b.lines.size());
             this.lines.addAll(a.lines);
@@ -53,10 +53,26 @@ public class NaiveAssignmentTable implements AssignmentTable {
             if (!dashes.equals(other.dashes))
                 return false;
 
-            assignment.xor(other.assignment);
-            boolean ret = assignment.cardinality() == 1; // If assignment and other.assignment differ in one bit only.
-            assignment.xor(other.assignment); // undo first xor
-            return ret;
+            // If assignment and other.assignment differ in one bit only.
+            return assignment.xor(other.assignment).cardinality() == 1;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder r = new StringBuilder();
+
+            for (int i = 0; i < assignment.size(); ++i) {
+                if (dashes.getBit(i)) {
+                    r.append("-");
+                } else {
+                    r.append(assignment.getBit(i) ? "1" : "0");
+                }
+            }
+
+            r.append(checked ? " X " : "   ");
+            r.append(lines.toString());
+
+            return r.toString();
         }
     }
 
@@ -76,16 +92,21 @@ public class NaiveAssignmentTable implements AssignmentTable {
         satisfyingAssignments.addAll(dontcareAssignments);
         satisfyingAssignments.sort(Comparator.comparingInt(Bits::cardinality));
 
-        final int numberOfGroups = satisfyingAssignments.get(satisfyingAssignments.size() - 1).cardinality();
+        /*
+        System.out.println("Sorted assignments:");
+        for (Bits b : satisfyingAssignments) {
+            System.out.println("  " + b);
+        }//*/
 
-        groups = new ArrayList<>(numberOfGroups);
+        final int numberOfGroups = satisfyingAssignments.get(satisfyingAssignments.size() - 1).cardinality();
+        this.groups = new ArrayList<>(numberOfGroups);
+
         int lastMemberIndex = 0;
         for (int group = 1; group <= numberOfGroups; ++group) {
             int numberOfMembers;
             for (numberOfMembers = 0;
                  lastMemberIndex + numberOfMembers < satisfyingAssignments.size() && satisfyingAssignments.get(lastMemberIndex + numberOfMembers).cardinality() == group;
                  ++numberOfMembers);
-            assert(numberOfMembers > 0);
 
             List<Row> members = new ArrayList<>(numberOfMembers);
 
@@ -142,30 +163,14 @@ public class NaiveAssignmentTable implements AssignmentTable {
 
     @Override
     public void print() {
-        // This is WRONG!!!
         final int numberOfVariables = groups.get(0).get(0).assignment.size();
 
-        String separator = new String(new char[numberOfVariables]).replace("\0", "-");
+        String separator = new String(new char[numberOfVariables + 3 /*lines*/ + 10 /*linenumbers*/]).replace("\0", "-");
 
         System.out.println(separator);
         for (List<Row> group : groups) {
             for (Row row : group) {
-                for (int i = 0; i < numberOfVariables; ++i) {
-                    StringBuilder r = new StringBuilder();
-                    if (row.dashes.get(i)) {
-                        r.append("-");
-                    } else {
-                        r.append(row.assignment.get(i) ? "1" : "0");
-                    }
-
-                    r.append(row.checked ? " X " : "   ");
-
-                    for (BigInteger line : row.lines) {
-                        r.append(line);
-                    }
-
-                    System.out.println(r.toString());
-                }
+                System.out.println(row);
             }
 
             System.out.println(separator);

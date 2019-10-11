@@ -30,7 +30,7 @@ public class ConfigurationUtils {
 
         int i = 0;
         for (IFeature f : featureOrder) {
-            assignment.set(i, selectedFeatures.contains(f));
+            assignment.setBitTo(i, selectedFeatures.contains(f));
             ++i;
         }
 
