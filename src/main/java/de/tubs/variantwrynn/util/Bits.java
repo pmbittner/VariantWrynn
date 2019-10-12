@@ -12,7 +12,7 @@ import java.util.List;
 public class Bits {
     private static final int WordSize = Long.SIZE;
     private long[] words;
-    private int numBits;
+    private final int numBits;
 
     private int wordIndexOfGlobalIndex(int i) {
         return i / WordSize;
@@ -173,5 +173,19 @@ public class Bits {
         }
 
         return sb.reverse().toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Bits)) return false;
+
+        Bits other = (Bits) obj;
+        if (this.numBits == other.numBits) {
+            this.cleanExtraBits();
+            other.cleanExtraBits();
+            return Arrays.equals(this.words, other.words);
+        }
+
+        return false;
     }
 }

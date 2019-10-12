@@ -19,19 +19,36 @@ public class NodeUtils {
     }
 
     public static Literal referenceLiteral(Literal lit) {
+        return referenceLiteral(lit, lit.positive);
+    }
+
+    public static Literal referenceLiteral(Literal lit, boolean positive) {
         if (lit == null || lit.var == null) {
             throw new NullPointerException();
         }
-        return new Literal(lit.var, lit.positive);
+        return new Literal(lit.var, positive);
     }
 
     public static Literal reference(Object object) {
-        if (object instanceof Literal)
+        if (object instanceof Literal) {
             return referenceLiteral((Literal) object);
-        if (object instanceof IFeature)
+        }
+        if (object instanceof IFeature) {
             return reference(((IFeature) object).getName());
+        }
 
         return new Literal(object);
+    }
+
+    public static Literal reference(Object object, boolean positive) {
+        if (object instanceof Literal) {
+            return referenceLiteral((Literal) object, positive);
+        }
+        if (object instanceof IFeature) {
+            return reference(((IFeature) object).getName(), positive);
+        }
+
+        return new Literal(object, positive);
     }
 
     /**
@@ -44,9 +61,7 @@ public class NodeUtils {
             List<Node> andsChildren = new ArrayList<>(Arrays.asList(and.getChildren()));
             for (And redundantChild : redundantChildren) {
                 andsChildren.remove(redundantChild);
-
-                for (Node grandchild : redundantChild.getChildren())
-                    andsChildren.add(grandchild);
+                andsChildren.addAll(Arrays.asList(redundantChild.getChildren()));
             }
             redundantChildren.clear();
             and.setChildren(andsChildren.toArray());

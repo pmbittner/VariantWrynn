@@ -1,6 +1,8 @@
 package de.tubs.variantwrynn.core.synthesis.quinemccluskey;
 
 import de.tubs.variantwrynn.util.Bits;
+import de.tubs.variantwrynn.util.fide.NodeUtils;
+import org.prop4j.Literal;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -16,7 +18,7 @@ public class NaiveAssignmentTable implements AssignmentTable {
     private static class Row {
         final Bits assignment;
         final Bits dashes;
-        final List<BigInteger> lines;
+        private final List<BigInteger> lines;
         // If a line is checked, we don't need the lines anymore.
         // Thus, lines == null could represent checked.
         private boolean checked;
@@ -38,6 +40,9 @@ public class NaiveAssignmentTable implements AssignmentTable {
             this.lines = new ArrayList<>(a.lines.size() + b.lines.size());
             this.lines.addAll(a.lines);
             this.lines.addAll(b.lines);
+            Collections.sort(this.lines);
+
+            this.checked = false;
         }
 
         public boolean isChecked() {
@@ -69,18 +74,29 @@ public class NaiveAssignmentTable implements AssignmentTable {
                 }
             }
 
+            r.reverse();
+
             r.append(checked ? " X " : "   ");
             r.append(lines.toString());
 
             return r.toString();
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof Row)) return false;
+
+            Row other = (Row) obj;
+            return
+                    other.assignment.equals(this.assignment)
+                 && other.dashes.equals(this.dashes)
+                 && other.lines.equals(this.lines);
+        }
     }
 
     private List<List<Row>> groups = null;
 
-    public NaiveAssignmentTable() {
-
-    }
+    public NaiveAssignmentTable() {}
 
     @Override
     public void fillWith(List<Bits> satisfyingAssignments, List<Bits> unsatisfyingAssignments, List<Bits> dontcareAssignments) {
@@ -89,8 +105,9 @@ public class NaiveAssignmentTable implements AssignmentTable {
         }
 
         // sort by number of ones
-        satisfyingAssignments.addAll(dontcareAssignments);
-        satisfyingAssignments.sort(Comparator.comparingInt(Bits::cardinality));
+        List<Bits> assignments = new ArrayList<>(satisfyingAssignments);
+        assignments.addAll(dontcareAssignments);
+        assignments.sort(Comparator.comparingInt(Bits::cardinality));
 
         /*
         System.out.println("Sorted assignments:");
@@ -98,20 +115,21 @@ public class NaiveAssignmentTable implements AssignmentTable {
             System.out.println("  " + b);
         }//*/
 
-        final int numberOfGroups = satisfyingAssignments.get(satisfyingAssignments.size() - 1).cardinality();
+        final int numberOfGroups = assignments.get(assignments.size() - 1).cardinality();
         this.groups = new ArrayList<>(numberOfGroups);
 
         int lastMemberIndex = 0;
         for (int group = 1; group <= numberOfGroups; ++group) {
             int numberOfMembers;
-            for (numberOfMembers = 0;
-                 lastMemberIndex + numberOfMembers < satisfyingAssignments.size() && satisfyingAssignments.get(lastMemberIndex + numberOfMembers).cardinality() == group;
-                 ++numberOfMembers);
+            numberOfMembers = 0;
+            while (lastMemberIndex + numberOfMembers < assignments.size() && assignments.get(lastMemberIndex + numberOfMembers).cardinality() == group) {
+                ++numberOfMembers;
+            }
 
             List<Row> members = new ArrayList<>(numberOfMembers);
 
             for (int i = 0; i < numberOfMembers; ++i) {
-                Row r = new Row(satisfyingAssignments.get(lastMemberIndex + i));
+                Row r = new Row(assignments.get(lastMemberIndex + i));
                 r.lines.add(r.assignment.toBigInt());
                 members.add(r);
             }
@@ -141,7 +159,10 @@ public class NaiveAssignmentTable implements AssignmentTable {
                     if (a.isMergeableWith(b)) {
                         a.check();
                         b.check();
-                        nextGroup.add(new Row(a, b));
+                        // Maybe we should not insert duplicates here:
+                        Row merged = new Row(a, b);
+                        if (!nextGroup.contains(merged))
+                            nextGroup.add(merged);
                     }
                 }
             }
@@ -162,18 +183,50 @@ public class NaiveAssignmentTable implements AssignmentTable {
     }
 
     @Override
-    public void print() {
-        final int numberOfVariables = groups.get(0).get(0).assignment.size();
+    public List<Implicant> getPrimeImplicants(List<String> variableNames) {
+        List<Implicant> varNames = new LinkedList<>();
 
-        String separator = new String(new char[numberOfVariables + 3 /*lines*/ + 10 /*linenumbers*/]).replace("\0", "-");
-
-        System.out.println(separator);
         for (List<Row> group : groups) {
             for (Row row : group) {
-                System.out.println(row);
+                if (!row.isChecked()) {
+                    List<Literal> clause = new ArrayList<>(row.assignment.size());
+
+                    for (int i = 0; i < variableNames.size(); ++i) {
+                        if (!row.dashes.getBit(i)) {
+                            clause.add(
+                                    NodeUtils.reference(
+                                            variableNames.get(i),
+                                            row.assignment.getBit(i)
+                                    )
+                            );
+                        }
+                    }
+
+                    varNames.add(new Implicant(clause, row.lines));
+                }
+            }
+        }
+
+        return varNames;
+    }
+
+    @Override
+    public String toString() {
+        final int numberOfVariables = groups.get(0).get(0).assignment.size();
+        StringBuilder res = new StringBuilder();
+
+        String separator = new String(new char[numberOfVariables + 3 /*lines*/ + 10 /*linenumbers*/]).replace("\0", "-");
+        separator += "\n";
+
+        res.append(separator);
+        for (List<Row> group : groups) {
+            for (Row row : group) {
+                res.append(row).append("\n");
             }
 
-            System.out.println(separator);
+            res.append(separator);
         }
+
+        return res.toString();
     }
 }

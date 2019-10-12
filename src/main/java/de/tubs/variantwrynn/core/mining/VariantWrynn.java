@@ -9,9 +9,13 @@ import de.tubs.variantwrynn.core.synthesis.quinemccluskey.QuineMcCluskey;
 import de.tubs.variantwrynn.util.Bits;
 import de.tubs.variantwrynn.util.Yield;
 import de.tubs.variantwrynn.util.fide.ConfigurationUtils;
+import org.prop4j.And;
+import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class VariantWrynn {
@@ -48,6 +52,23 @@ public class VariantWrynn {
         // We need them for the derivation with the Quine-McCluskey algorithm in the next step.
         // Maybe, bitsets suffice.
 
-        return new QuineMcCluskey().synthesise(v_top, v_bot, v_dc);
+        Yield<List<Literal>> clauses = new QuineMcCluskey().synthesise(fm.getFeatureOrderList(), v_top, v_bot, v_dc);
+        return new Yield<>(
+                clauses::hasNext,
+                () -> {
+                    // We can remove mandatory features if there are non-mandatory features in the proposed mapping.
+                    List<Literal> clause = new ArrayList<>(clauses.next());
+
+                    for (int i = 0; i < clause.size(); ++i) {
+                        Literal l = clause.get(i);
+                        if (fm.getFeature((String)l.var).getStructure().isMandatory()) {
+                            clause.remove(i);
+                            --i;
+                        }
+                    }
+
+                    return new And(clause);
+                }
+        );
     }
 }

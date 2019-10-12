@@ -1,15 +1,20 @@
 package de.tubs.variantwrynn;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.tubs.variantwrynn.core.mining.VariantWrynn;
 import de.tubs.variantwrynn.core.model.Artefact;
 import de.tubs.variantwrynn.core.simpleimpl.ListVariant;
 import de.tubs.variantwrynn.core.simpleimpl.OrthogonalStringArtefact;
 import de.tubs.variantwrynn.core.simpleimpl.SimpleVariantSyncProject;
 import de.tubs.variantwrynn.core.synthesis.quinemccluskey.QuineMcCluskey;
 import de.tubs.variantwrynn.util.Bits;
+import de.tubs.variantwrynn.util.Yield;
 import de.tubs.variantwrynn.util.fide.IO;
 import de.tubs.variantwrynn.util.fide.NodeUtils;
+import de.tubs.variantwrynn.util.namegenerator.AlphabeticNameGenerator;
+import de.tubs.variantwrynn.util.namegenerator.NameGenerator;
 import org.prop4j.And;
+import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import java.util.*;
@@ -94,11 +99,18 @@ public class Main {
     }
 
     private static void QuineMcCluskeyTest() {
+        final int numVars = 4;
+        List<String> varNames = new ArrayList<>(numVars);
+        NameGenerator nameGenerator = new AlphabeticNameGenerator();
+        for (int i = numVars - 1; i >= 0; --i) {
+            varNames.add(nameGenerator.getNameAtIndex(i));
+        }
+
         QuineMcCluskey qmc = new QuineMcCluskey();
         List<Bits> satisfyingAssignments =
-                Bits.fromDecimals(4,1, 3, 6, 11, 13);
+                Bits.fromDecimals(numVars,1, 3, 6, 11, 13);
         List<Bits> dontcareAssignments =
-                Bits.fromDecimals(4,2, 7, 15);
+                Bits.fromDecimals(numVars,2, 7, 15);
 
         /*
         System.out.println("Satisfying Assignments:");
@@ -113,7 +125,8 @@ public class Main {
         }//*/
 
         //*
-        for (Node recommendation : qmc.synthesise(satisfyingAssignments, null, dontcareAssignments)) {
+        Yield<List<Literal>> clauses = qmc.synthesise(varNames, satisfyingAssignments, null, dontcareAssignments);
+        for (List<Literal> recommendation : clauses) {
             System.out.println("  " + recommendation);
         }//*/
     }
@@ -154,7 +167,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-//*
+/*
         System.out.println("\n========== Quine-McCluskey Algorithm Test ==============================================\n");
         QuineMcCluskeyTest();
 /*/

@@ -1,7 +1,6 @@
 package de.tubs.variantwrynn.core.synthesis.quinemccluskey;
 
 import de.tubs.variantwrynn.util.Bits;
-
 import java.util.List;
 
 /**
@@ -10,10 +9,7 @@ import java.util.List;
  */
 public interface AssignmentTable {
     void fillWith(List<Bits> satisfyingAssignments, List<Bits> unsatisfyingAssignments, List<Bits> dontcareAssignments);
-
     AssignmentTable mergeIntoNextTable();
-
     boolean isEmpty();
-
-    void print();
+    List<Implicant> getPrimeImplicants(List<String> variableNames);
 }

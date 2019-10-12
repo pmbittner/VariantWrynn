@@ -25,8 +25,8 @@ public class BitAssignmentTable implements AssignmentTable {
     }
 
     @Override
-    public void print() {
-
+    public List<Implicant> getPrimeImplicants(List<String> variableNames) {
+        return null;
     }
 
     /**
