@@ -1,10 +1,12 @@
 package de.tubs.variantwrynn.util.fide;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.tubs.variantwrynn.util.Bits;
 import org.prop4j.Node;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,5 +37,10 @@ public class ConfigurationUtils {
         }
 
         return assignment;
+    }
+
+    public static List<Bits> getValidConfigurationsOf(IFeatureModel fm, List<IFeature> featureOrder) {
+        // FIXME: Not implemented
+        return new ArrayList<>(0);
     }
 }

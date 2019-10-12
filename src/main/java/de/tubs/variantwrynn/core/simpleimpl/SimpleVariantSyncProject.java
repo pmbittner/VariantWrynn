@@ -3,6 +3,7 @@ package de.tubs.variantwrynn.core.simpleimpl;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.tubs.variantwrynn.core.model.Artefact;
+import de.tubs.variantwrynn.core.model.Variant;
 import de.tubs.variantwrynn.core.model.VariantSyncProject;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class SimpleVariantSyncProject implements VariantSyncProject {
     }
 
     @Override
-    public List<ListVariant> getVariants() {
+    public List<? extends Variant> getVariants() {
         return variants;
     }
 

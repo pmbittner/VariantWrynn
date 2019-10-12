@@ -3,6 +3,7 @@ package de.tubs.variantwrynn;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.tubs.variantwrynn.core.mining.VariantWrynn;
 import de.tubs.variantwrynn.core.model.Artefact;
+import de.tubs.variantwrynn.core.model.Variant;
 import de.tubs.variantwrynn.core.simpleimpl.ListVariant;
 import de.tubs.variantwrynn.core.simpleimpl.OrthogonalStringArtefact;
 import de.tubs.variantwrynn.core.simpleimpl.SimpleVariantSyncProject;
@@ -183,8 +184,9 @@ public class Main {
         /// 1.) Get all artefacts A
         /// So far we only consider exact equality (similarity = 1). Hence, represent A as a set to avoid duplicates.
         Set<Artefact> A = new HashSet<>();
-        for (ListVariant v : vs.getVariants()) {
-            A.addAll(v.getArtefacts());
+        // This approach of gathering all artefacts is currently quite hacky but is only necessary for the example.
+        for (Variant v : vs.getVariants()) {
+            A.addAll(((ListVariant)v).getArtefacts());
         }
 
         /// 2.) Generate recommendations for each artefact

@@ -34,7 +34,7 @@ public class VariantWrynn {
 
         List<Bits> v_top = new ArrayList<>();
         List<Bits> v_bot = new ArrayList<>();
-        List<Bits> v_dc  = new ArrayList<>();
+        List<Bits> v_dc;
 
         for (Variant v : vsProject.getVariants()) {
             Bits c = ConfigurationUtils.toAssignment(v.getConfiguration(), featureOrder);
@@ -51,6 +51,9 @@ public class VariantWrynn {
         // As these aren't concrete variants, instances of the Variant interface dont make sense here and only would litter our precious memory.
         // We need them for the derivation with the Quine-McCluskey algorithm in the next step.
         // Maybe, bitsets suffice.
+        v_dc = ConfigurationUtils.getValidConfigurationsOf(fm, featureOrder);
+        v_dc.removeAll(v_top);
+        v_dc.removeAll(v_bot);
 
         Yield<List<Literal>> clauses = new QuineMcCluskey().synthesise(fm.getFeatureOrderList(), v_top, v_bot, v_dc);
         return new Yield<>(
