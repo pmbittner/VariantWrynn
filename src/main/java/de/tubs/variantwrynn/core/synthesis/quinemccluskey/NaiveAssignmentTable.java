@@ -54,12 +54,8 @@ public class NaiveAssignmentTable implements AssignmentTable {
         }
 
         public boolean isMergeableWith(Row other) {
-            // Stupid java dev set clone return type to Object instead of BitSet...
-            if (!dashes.equals(other.dashes))
-                return false;
-
-            // If assignment and other.assignment differ in one bit only.
-            return assignment.xor(other.assignment).cardinality() == 1;
+            // assignment and other.assignment differ in one bit only.
+            return dashes.equals(other.dashes) && assignment.xor(other.assignment).cardinality() == 1;
         }
 
         @Override
