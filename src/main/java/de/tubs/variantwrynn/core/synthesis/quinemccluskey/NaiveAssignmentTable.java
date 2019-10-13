@@ -105,13 +105,14 @@ public class NaiveAssignmentTable implements AssignmentTable {
         assignments.addAll(dontcareAssignments);
         assignments.sort(Comparator.comparingInt(Bits::cardinality));
 
-        /*
-        System.out.println("Sorted assignments:");
-        for (Bits b : satisfyingAssignments) {
-            System.out.println("  " + b);
-        }//*/
+        int numberOfGroups;
+        if (assignments .isEmpty()) {
+            System.err.println("[NaiveAssignmentTable::fillWith] Warning: Given assignments are empty!");
+            numberOfGroups = 0;
+        } else {
+            numberOfGroups = assignments.get(assignments.size() - 1).cardinality();
+        }
 
-        final int numberOfGroups = assignments.get(assignments.size() - 1).cardinality();
         this.groups = new ArrayList<>(numberOfGroups);
 
         int lastMemberIndex = 0;
@@ -138,6 +139,11 @@ public class NaiveAssignmentTable implements AssignmentTable {
     @Override
     public NaiveAssignmentTable mergeIntoNextTable() {
         final NaiveAssignmentTable next = new NaiveAssignmentTable();
+
+        if (groups == null || groups.isEmpty()) {
+            return next;
+        }
+
         final int numberOfNextsGroups = this.groups.size() - 1;
         next.groups = new ArrayList<>(numberOfNextsGroups);
 

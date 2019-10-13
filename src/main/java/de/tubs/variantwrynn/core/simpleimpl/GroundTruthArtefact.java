@@ -1,18 +1,21 @@
 package de.tubs.variantwrynn.core.simpleimpl;
 
 import de.tubs.variantwrynn.core.model.Artefact;
+import org.prop4j.Node;
 
-public class OrthogonalStringArtefact implements Artefact {
-    public final String value;
+public class GroundTruthArtefact<T> implements Artefact {
+    private final Node groundTruthMapping;
+    public final T value;
 
-    public OrthogonalStringArtefact(String value) {
+    public GroundTruthArtefact(T value, Node groundTruthMapping) {
         this.value = value;
+        this.groundTruthMapping = groundTruthMapping;
     }
 
     @Override
     public float getSimilarityWith(Artefact artefact) {
-        if (artefact instanceof OrthogonalStringArtefact) {
-            if (((OrthogonalStringArtefact) artefact).value.equals(value)) {
+        if (artefact instanceof GroundTruthArtefact) {
+            if (((GroundTruthArtefact) artefact).value.equals(value)) {
                 return 1;
             }
         }
@@ -20,9 +23,13 @@ public class OrthogonalStringArtefact implements Artefact {
         return 0;
     }
 
+    public Node getGroundTruthMapping() {
+        return groundTruthMapping;
+    }
+
     @Override
     public String toString() {
-        return value;
+        return value.toString();
     }
 
     @Override

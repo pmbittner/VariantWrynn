@@ -42,7 +42,7 @@ public class ListVariant implements Variant {
         return config;
     }
 
-    public List<Artefact> getArtefacts() {
+    public List<? extends Artefact> getArtefacts() {
         return artefacts;
     }
 }

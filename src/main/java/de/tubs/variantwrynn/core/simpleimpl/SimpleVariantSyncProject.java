@@ -32,19 +32,22 @@ public class SimpleVariantSyncProject implements VariantSyncProject {
         System.out.println("[SimpleVariantSyncProject.print]");
 
         for (ListVariant v : variants) {
-            System.out.println("Variant " + variantIndex + " ------------------------------------------------------------------------------");
+            System.out.print("Variant " + variantIndex);// + " ------------------------------------------------------------------------------");
 
             List<IFeature> selectedFeatures = v.getConfiguration().getSelectedFeatures();
-            System.out.print("  Configuration = {" + selectedFeatures.get(0));
+            //System.out.print("  Configuration = {" + selectedFeatures.get(0));
+            System.out.print(" {" + selectedFeatures.get(0));
             for (int i = 1; i < selectedFeatures.size(); ++i) {
                 System.out.print(", " + selectedFeatures.get(i).getName());
             }
             System.out.println("}");
 
+            //*
             System.out.println("  Artefacts: ");
             for (Artefact a : v.getArtefacts()) {
                 System.out.println("    " + a);
             }
+            //*/
 
             ++variantIndex;
         }

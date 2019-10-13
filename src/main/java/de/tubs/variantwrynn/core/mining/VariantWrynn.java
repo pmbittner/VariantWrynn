@@ -59,7 +59,11 @@ public class VariantWrynn {
         return new Yield<>(
                 clauses::hasNext,
                 () -> {
-                    // We can remove mandatory features if there are non-mandatory features in the proposed mapping.
+                    // If we have a single variant not containing a, a cannot be mapped to a mandatory feature!
+                    // Current hack: We can remove mandatory features if there are non-mandatory features in the proposed mapping.
+                    /*
+                    List<Literal> clause = clauses.next();
+                    /*/
                     List<Literal> clause = new ArrayList<>(clauses.next());
 
                     for (int i = 0; i < clause.size(); ++i) {
@@ -69,6 +73,7 @@ public class VariantWrynn {
                             --i;
                         }
                     }
+                    //*/
 
                     return new And(clause);
                 }

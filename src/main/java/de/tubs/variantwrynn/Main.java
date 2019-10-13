@@ -5,7 +5,7 @@ import de.tubs.variantwrynn.core.mining.VariantWrynn;
 import de.tubs.variantwrynn.core.model.Artefact;
 import de.tubs.variantwrynn.core.model.Variant;
 import de.tubs.variantwrynn.core.simpleimpl.ListVariant;
-import de.tubs.variantwrynn.core.simpleimpl.OrthogonalStringArtefact;
+import de.tubs.variantwrynn.core.simpleimpl.GroundTruthArtefact;
 import de.tubs.variantwrynn.core.simpleimpl.SimpleVariantSyncProject;
 import de.tubs.variantwrynn.core.synthesis.quinemccluskey.QuineMcCluskey;
 import de.tubs.variantwrynn.util.Bits;
@@ -20,23 +20,10 @@ import org.prop4j.Node;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Main {
     private static String DefaultResourceDirectory = "src/main/resources";
-
-    /**
-     * Represents artefacts with a feature mapping formula.
-     * We use this to represent ground truth data for tests and evaluation.
-     */
-    private static class MappedArtefact {
-        Node mapping;
-        Artefact artefact;
-
-        MappedArtefact(Node mapping, Artefact artefact) {
-            this.mapping = mapping;
-            this.artefact = artefact;
-        }
-    }
 
     private static SimpleVariantSyncProject createTestScenario() {
         final int numVariants = 5;
@@ -50,9 +37,10 @@ public class Main {
         String fmFile = DefaultResourceDirectory + "/fm/DumbPL.xml";
         IFeatureModel globalFM = IO.loadFile(fmFile);
 
-        List<MappedArtefact> A = new ArrayList<>();
+        List<GroundTruthArtefact<String>> A = new ArrayList<>();
         {
-            BiConsumer<Node, String> addArtefact = (Node m, String a) -> A.add(new MappedArtefact(m, new OrthogonalStringArtefact(a)));
+            //*
+            BiConsumer<Node, String> addArtefact = (Node m, String a) -> A.add(new GroundTruthArtefact<>(a, m));
 
             addArtefact.accept(NodeUtils.reference(fName_Comment), "// This is the coolest variant!");
             addArtefact.accept(NodeUtils.reference(fName_Print), "print(\"Moin\");");
@@ -62,6 +50,7 @@ public class Main {
             addArtefact.accept(new And(NodeUtils.reference(fName_Constexpr), NodeUtils.reference(fName_Assignment)),"constexpr inline int add(int a, int b) { constexpr int sum = a + b; return sum; }");
             addArtefact.accept(new And(NodeUtils.reference(fName_Print), NodeUtils.reference(fName_Constexpr)),"constexpr int i = add(4, 2); print(\"I am active on constexpr \" + i);");
             addArtefact.accept(new And(NodeUtils.reference(fName_Print), NodeUtils.negate(NodeUtils.reference(fName_Constexpr))), "int i = add(4, 2); print(\"I am active on not constexpr \" + i);");
+            //*/
         }
 
         List<ListVariant> variants = new ArrayList<>(numVariants);
@@ -87,10 +76,10 @@ public class Main {
             variants.get(4).select(fName_Mem);
 
             // Add each artefact to all variants whose confguration satisfies the artefacts mapping.
-            for (MappedArtefact ma : A) {
+            for (GroundTruthArtefact<String> ma : A) {
                 for (ListVariant v : variants) {
-                    if (v.configurationSatisfies(ma.mapping)) {
-                        v.add(ma.artefact);
+                    if (v.configurationSatisfies(ma.getGroundTruthMapping())) {
+                        v.add(ma);
                     }
                 }
             }
@@ -183,19 +172,21 @@ public class Main {
 
         /// 1.) Get all artefacts A
         /// So far we only consider exact equality (similarity = 1). Hence, represent A as a set to avoid duplicates.
-        Set<Artefact> A = new HashSet<>();
+        Set<GroundTruthArtefact<?>> A = new HashSet<>();
         // This approach of gathering all artefacts is currently quite hacky but is only necessary for the example.
         for (Variant v : vs.getVariants()) {
-            A.addAll(((ListVariant)v).getArtefacts());
+            A.addAll((Collection<? extends GroundTruthArtefact<?>>) ((ListVariant)v).getArtefacts());
         }
 
         /// 2.) Generate recommendations for each artefact
-        for (Artefact a : A) {
-            System.out.println("VariantWrynn[\"" + a + "\"] recommends:");
+        for (GroundTruthArtefact<?> a : A) {
+            System.out.println("Recommendation for [" + a + "] with GT mapping [" + a.getGroundTruthMapping() + "]:");
 
             for (Node recommendation : variantWrynn.recommendFeatureMappingFor(a)) {
                 System.out.println("  " + recommendation);
             }
+
+            System.out.println();
         }
 //*/
     }
