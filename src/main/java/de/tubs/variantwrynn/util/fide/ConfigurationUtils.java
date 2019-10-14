@@ -6,10 +6,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.tubs.variantwrynn.util.Bits;
 import org.prop4j.Node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConfigurationUtils {
     public static boolean isSatisfyingAssignment(Configuration config, Node formula) {
@@ -26,12 +23,12 @@ public class ConfigurationUtils {
         return formula.getValue(assignment);
     }
 
-    public static Bits toAssignment(Configuration config, List<IFeature> featureOrder) {
-        final List<IFeature> selectedFeatures = config.getSelectedFeatures();
+    public static Bits toAssignment(Configuration config, List<String> featureOrder) {
+        final Set<String> selectedFeatures = config.getSelectedFeatureNames();
         Bits assignment = new Bits(featureOrder.size());
 
         int i = 0;
-        for (IFeature f : featureOrder) {
+        for (String f : featureOrder) {
             assignment.setBitTo(i, selectedFeatures.contains(f));
             ++i;
         }
@@ -39,7 +36,7 @@ public class ConfigurationUtils {
         return assignment;
     }
 
-    public static List<Bits> getValidConfigurationsOf(IFeatureModel fm, List<IFeature> featureOrder) {
+    public static List<Bits> getValidConfigurationsOf(IFeatureModel fm, List<String> featureOrder) {
         // FIXME: Not implemented
         return new ArrayList<>(0);
     }

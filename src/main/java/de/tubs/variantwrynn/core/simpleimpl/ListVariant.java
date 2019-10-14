@@ -1,14 +1,14 @@
 package de.tubs.variantwrynn.core.simpleimpl;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.tubs.variantwrynn.core.model.Artefact;
 import de.tubs.variantwrynn.core.model.Variant;
-import org.prop4j.Node;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ListVariant implements Variant {
     private List<Artefact> artefacts;

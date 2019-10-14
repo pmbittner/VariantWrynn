@@ -23,7 +23,7 @@ public class NaiveAssignmentTable implements AssignmentTable {
         // Thus, lines == null could represent checked.
         private boolean checked;
 
-        Row(Bits assignment) {
+        private Row(Bits assignment) {
             this.assignment = assignment;
             this.dashes = new Bits(assignment.size());
             this.lines = new ArrayList<>(8);
@@ -31,7 +31,7 @@ public class NaiveAssignmentTable implements AssignmentTable {
         }
 
         // Merge constructor
-        Row(Row a, Row b) {
+        private Row(Row a, Row b) {
             this.assignment = b.assignment.and(a.assignment);
 
             // b.dashes would also be correct
@@ -45,15 +45,15 @@ public class NaiveAssignmentTable implements AssignmentTable {
             this.checked = false;
         }
 
-        public boolean isChecked() {
+        private boolean isChecked() {
             return checked;
         }
 
-        public void check() {
+        private void check() {
             checked = true;
         }
 
-        public boolean isMergeableWith(Row other) {
+        private boolean isMergeableWith(Row other) {
             // assignment and other.assignment differ in one bit only.
             return dashes.equals(other.dashes) && assignment.xor(other.assignment).cardinality() == 1;
         }
@@ -148,7 +148,7 @@ public class NaiveAssignmentTable implements AssignmentTable {
         next.groups = new ArrayList<>(numberOfNextsGroups);
 
         for (int group = 0; group < numberOfNextsGroups; ++group) {
-            /**
+            /*
              * Worst case size is when all pairs are mergeable.
              * Then we would get sizeof(group1) * sizeof(group2) entries.
              * However, much less matches are expected.

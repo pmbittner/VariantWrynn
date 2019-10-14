@@ -5,7 +5,7 @@ import org.prop4j.Node;
 
 public class GroundTruthArtefact<T> implements Artefact {
     private final Node groundTruthMapping;
-    public final T value;
+    private final T value;
 
     public GroundTruthArtefact(T value, Node groundTruthMapping) {
         this.value = value;

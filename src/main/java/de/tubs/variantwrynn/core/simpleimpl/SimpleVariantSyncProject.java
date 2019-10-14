@@ -9,8 +9,8 @@ import de.tubs.variantwrynn.core.model.VariantSyncProject;
 import java.util.List;
 
 public class SimpleVariantSyncProject implements VariantSyncProject {
-    private List<ListVariant> variants = null;
-    private IFeatureModel fm = null;
+    private List<ListVariant> variants;
+    private IFeatureModel fm;
 
     public SimpleVariantSyncProject(IFeatureModel fm, List<ListVariant> variants) {
         this.fm = fm;
@@ -18,7 +18,7 @@ public class SimpleVariantSyncProject implements VariantSyncProject {
     }
 
     @Override
-    public List<? extends Variant> getVariants() {
+    public List<ListVariant> getVariants() {
         return variants;
     }
 
