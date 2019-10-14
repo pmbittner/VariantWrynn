@@ -80,8 +80,7 @@ public class Bits {
     }
 
     public Bits and(Bits other) {
-        Bits res = new Bits(this);
-        return res.inlineAnd(other);
+        return new Bits(this).inlineAnd(other);
     }
 
     public Bits inlineOr(Bits other) {
@@ -95,8 +94,7 @@ public class Bits {
     }
 
     public Bits or(Bits other) {
-        Bits res = new Bits(this);
-        return res.inlineOr(other);
+        return new Bits(this).inlineOr(other);
     }
 
     public Bits inlineXor(Bits other) {
@@ -110,10 +108,13 @@ public class Bits {
     }
 
     public Bits xor(Bits other) {
-        Bits res = new Bits(this);
-        return res.inlineXor(other);
+        return new Bits(this).inlineXor(other);
     }
 
+    /**
+     * Mostly, the words array is longer than the actual represented bit string.
+     * This method sets all trailing bits not belonging to the represented bit string to 0.
+     */
     private void cleanExtraBits() {
         final int localIndex = numBits - (words.length - 1) * WordSize;
 
@@ -131,7 +132,7 @@ public class Bits {
         return numBits;
     }
 
-    public long capacity() {
+    public int capacity() {
         return WordSize * words.length;
     }
 
