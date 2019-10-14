@@ -12,10 +12,8 @@ import de.tubs.variantwrynn.util.fide.ConfigurationUtils;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Or;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class VariantWrynn {
@@ -27,14 +25,21 @@ public class VariantWrynn {
 
     public Yield<Node> recommendFeatureMappingFor(Artefact a) {
         final IFeatureModel fm = vsProject.getFeatureModel();
-        final List<IFeature> featureOrder = new ArrayList<>(fm.getNumberOfFeatures());
-        for (String fName : fm.getFeatureOrderList()) {
-            featureOrder.add(fm.getFeature(fName));
-        }
+        List<String> featureOrder = new ArrayList<>(fm.getFeatureOrderList());
 
         List<Bits> v_top = new ArrayList<>();
         List<Bits> v_bot = new ArrayList<>();
         List<Bits> v_dc;
+
+        // If v_bot is not empty, i.e., there is at least one variant not containing a,
+        // a cannot be mapped to any mandatory feature.
+        if (vsProject.getVariants().stream().anyMatch(v -> !v.contains(a))) {
+            for (IFeature f : fm.getFeatures()) {
+                if (f.getStructure().isMandatory()) {
+                    featureOrder.remove(f.getName());
+                }
+            }
+        }
 
         for (Variant v : vsProject.getVariants()) {
             Bits c = ConfigurationUtils.toAssignment(v.getConfiguration(), featureOrder);
@@ -46,7 +51,6 @@ public class VariantWrynn {
             }
         }
 
-        // List<Variant> v_dontcare = new ArrayList<>();
         // v_dontcare are all variants / configurations that have no implementation but are implicitly given by the featuremodel.
         // As these aren't concrete variants, instances of the Variant interface dont make sense here and only would litter our precious memory.
         // We need them for the derivation with the Quine-McCluskey algorithm in the next step.
@@ -55,28 +59,10 @@ public class VariantWrynn {
         v_dc.removeAll(v_top);
         v_dc.removeAll(v_bot);
 
-        Yield<List<Literal>> clauses = new QuineMcCluskey().synthesise(fm.getFeatureOrderList(), v_top, v_bot, v_dc);
+        Yield<List<Literal>> clauses = new QuineMcCluskey().synthesise(featureOrder, v_top, v_bot, v_dc);
         return new Yield<>(
                 clauses::hasNext,
-                () -> {
-                    // If we have a single variant not containing a, a cannot be mapped to a mandatory feature!
-                    // Current hack: We can remove mandatory features if there are non-mandatory features in the proposed mapping.
-                    /*
-                    List<Literal> clause = clauses.next();
-                    /*/
-                    List<Literal> clause = new ArrayList<>(clauses.next());
-
-                    for (int i = 0; i < clause.size(); ++i) {
-                        Literal l = clause.get(i);
-                        if (fm.getFeature((String)l.var).getStructure().isMandatory()) {
-                            clause.remove(i);
-                            --i;
-                        }
-                    }
-                    //*/
-
-                    return new And(clause);
-                }
+                () -> new And(clauses.next())
         );
     }
 }
