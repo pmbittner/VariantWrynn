@@ -15,9 +15,12 @@ import de.tubs.variantwrynn.util.namegenerator.NameGenerator;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Main {
     private static String DefaultResourceDirectory = "src/main/resources";
@@ -36,16 +39,36 @@ public class Main {
 
         List<GroundTruthArtefact<String>> A = new ArrayList<>();
         {
+            //*
             BiConsumer<Node, String> addArtefact = (Node m, String a) -> A.add(new GroundTruthArtefact<>(a, m));
-
             addArtefact.accept(NodeUtils.reference(fName_Comment), "// This is the coolest variant!");
             addArtefact.accept(NodeUtils.reference(fName_Print), "print(\"Moin\");");
             addArtefact.accept(NodeUtils.reference(fName_Mem),"delete smart_ptr_pointer;");
             addArtefact.accept(NodeUtils.reference(fName_Assignment), "these.examples.are.too.detailed = \"lol\"");
             addArtefact.accept(new And(NodeUtils.reference(fName_Mem), NodeUtils.reference(fName_Assignment)), "void* mem = malloc(1 << 40);");
-            addArtefact.accept(new And(NodeUtils.reference(fName_Constexpr), NodeUtils.reference(fName_Assignment)),"constexpr inline int add(int a, int b) { constexpr int sum = a + b; return sum; }");
+            addArtefact.accept(new Or(NodeUtils.reference(fName_Constexpr), NodeUtils.reference(fName_Assignment)),"constexpr inline int add(int a, int b) { constexpr int sum = a + b; return sum; }");
             addArtefact.accept(new And(NodeUtils.reference(fName_Print), NodeUtils.reference(fName_Constexpr)),"constexpr int i = add(4, 2); print(\"I am active on constexpr \" + i);");
             addArtefact.accept(new And(NodeUtils.reference(fName_Print), NodeUtils.negate(NodeUtils.reference(fName_Constexpr))), "int i = add(4, 2); print(\"I am active on not constexpr \" + i);");
+
+            /*/
+
+            Consumer<Node> addArtefact;
+            {
+                NameGenerator nameGenerator = new AlphabeticNameGenerator();
+                AtomicInteger currentNameIndex = new AtomicInteger();
+                addArtefact = (Node m) -> A.add(new GroundTruthArtefact<>(nameGenerator.getNameAtIndex(currentNameIndex.getAndIncrement()), m));
+            }
+            addArtefact.accept(NodeUtils.reference(fName_Comment));
+            addArtefact.accept(NodeUtils.reference(fName_Print));
+            addArtefact.accept(NodeUtils.reference(fName_Mem));
+            addArtefact.accept(NodeUtils.reference(fName_Assignment));
+            addArtefact.accept(NodeUtils.reference(fName_Constexpr));
+            addArtefact.accept(new And(NodeUtils.reference(fName_Mem), NodeUtils.reference(fName_Assignment)));
+            addArtefact.accept(new Or(NodeUtils.reference(fName_Constexpr), NodeUtils.reference(fName_Assignment)));
+            addArtefact.accept(new And(NodeUtils.reference(fName_Print), NodeUtils.reference(fName_Constexpr)));
+            addArtefact.accept(new And(NodeUtils.reference(fName_Print), NodeUtils.negate(NodeUtils.reference(fName_Constexpr))));
+            addArtefact.accept(new Or(fName_Assignment, new And(NodeUtils.reference(fName_Print), NodeUtils.negate(NodeUtils.reference(fName_Constexpr)))));
+            //*/
         }
 
         List<ListVariant> variants = new ArrayList<>(numVariants);
@@ -175,9 +198,11 @@ public class Main {
 
         /// 2.) Generate recommendations for each artefact
         for (GroundTruthArtefact<?> a : A) {
-            System.out.println("Recommendation for [" + a + "] with GT mapping [" + a.getGroundTruthMapping() + "]:");
+            System.out.println("Recommendations for [" + a + "] with GT mapping [" + a.getGroundTruthMapping() + "]:");
 
-            for (Node recommendation : variantWrynn.recommendFeatureMappingFor(a)) {
+            List<Literal> featureContext = a.getGroundTruthMapping().getLiterals();
+
+            for (Node recommendation : variantWrynn.recommendFeatureMappingFor(a, featureContext)) {
                 System.out.println("  " + recommendation);
             }
 

@@ -9,6 +9,7 @@ import de.tubs.variantwrynn.core.synthesis.quinemccluskey.QuineMcCluskey;
 import de.tubs.variantwrynn.util.Bits;
 import de.tubs.variantwrynn.util.Yield;
 import de.tubs.variantwrynn.util.fide.ConfigurationUtils;
+import de.tubs.variantwrynn.util.fide.NodeUtils;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -26,6 +27,27 @@ public class VariantWrynn {
     public Yield<Node> recommendFeatureMappingFor(Artefact a) {
         final IFeatureModel fm = vsProject.getFeatureModel();
         List<String> featureOrder = new ArrayList<>(fm.getFeatureOrderList());
+        List<Literal> featureContext = new ArrayList<>(featureOrder.size());
+
+        for (String feature : featureOrder) {
+            featureContext.add(NodeUtils.reference(feature));
+        }
+
+        return recommendFeatureMappingFor(a, featureContext);
+    }
+
+    public Yield<Node> recommendFeatureMappingFor(Artefact a, List<Literal> featureContext) {
+        final IFeatureModel fm = vsProject.getFeatureModel();
+
+        // First naive version for considering featureContext:
+        // We enforce that only features in the featureContext can be in the final formula.
+        // We omit negative literals for now.
+        List<String> featureOrder = new ArrayList<>(featureContext.size());
+        for (Literal literal : featureContext) {
+            //if (literal.positive) {
+                featureOrder.add(literal.var.toString());
+            //}
+        }
 
         List<Bits> v_top = new ArrayList<>();
         List<Bits> v_bot = new ArrayList<>();
