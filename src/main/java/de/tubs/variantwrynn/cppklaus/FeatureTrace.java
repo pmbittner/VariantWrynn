@@ -1,0 +1,139 @@
+package de.tubs.variantwrynn.cppklaus;
+
+import de.tubs.variantwrynn.util.fide.NodeUtils;
+import org.prop4j.And;
+import org.prop4j.Node;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+
+public class FeatureTrace {
+    public final List<CPPSPLCodeFragment> codeFragments;
+    private Node formula = null;
+
+    private final List<FeatureTrace> children;
+    private FeatureTrace parent = null;
+
+    public FeatureTrace() {
+        children = new ArrayList<>();
+        codeFragments = new ArrayList<>();
+    }
+
+    public void addArtefact(CPPSPLCodeFragment codeFragment) {
+        this.codeFragments.add(codeFragment);
+        // We assume that this step is actually unnecessary
+        this.codeFragments.sort(CPPSPLCodeFragment::compareTo);
+    }
+
+    public int getLocationBegin() {
+        return codeFragments.isEmpty() ? Integer.MAX_VALUE-1 : codeFragments.get(0).getLocation();
+    }
+
+    public int getLocationEnd() {
+        return codeFragments.isEmpty() ? Integer.MAX_VALUE : codeFragments.get(this.codeFragments.size() - 1).getLocation();
+    }
+
+    public void setFormula(Node node) {
+        this.formula = node;
+    }
+
+    public Node getFormula() {
+        return formula;
+    }
+
+    public boolean addChild(FeatureTrace child) {
+        if (child.parent == null) {
+            children.add(child);
+            child.parent = this;
+            return true;
+        } else {
+            System.out.println("[MacroHierarchy.addChild] Child has already a parent! aborting");
+            return false;
+        }
+    }
+
+    public boolean removeChild(FeatureTrace child) {
+        if (child.parent == this) {
+            if (children.remove(child)) {
+                child.parent = null;
+                return true;
+            } else {
+                System.err.println("[MacroHierarchy.removeChild] Could not remove child! This may be due to an inconsistent state.");
+            }
+        } else {
+            System.err.println("[MacroHierarchy.removeChild] This is not my child! aborting");
+        }
+
+        return false;
+    }
+
+    public FeatureTrace getParent() {
+        return parent;
+    }
+
+    public void simplify() {
+        Node me = getFormula();
+        if (me != null)
+            me.simplify();
+
+        for (FeatureTrace child : children)
+            child.simplify();
+    }
+
+    public void cascadeFormulas() {
+        Node me = getFormula();
+
+        if (me != null) {
+            for (FeatureTrace child : children) {
+                child.setFormula(
+                        new And(me, child.getFormula())
+                );
+            }
+        }
+
+        for (FeatureTrace child : children) {
+            child.cascadeFormulas();
+        }
+    }
+
+    public boolean isConjunctiveNormalForm() {
+        Node me = getFormula();
+
+        if (me == null || me.isConjunctiveNormalForm()) {
+            for (FeatureTrace child : children) {
+                if (!child.isConjunctiveNormalForm())
+                    return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void prettyPrint(PrintStream out, String indent) {
+        out.println(indent + "{" + NodeUtils.toString(this.formula) + "}");
+
+        String childIndent = indent + "  ";
+        int artefactIndex = 0;
+        for (FeatureTrace child : children) {
+            final int childLocation = child.getLocationBegin();
+
+            while (artefactIndex < codeFragments.size() && codeFragments.get(artefactIndex).getLocation() < childLocation) {
+                codeFragments.get(artefactIndex).prettyPrint(out, indent);
+                ++artefactIndex;
+            }
+
+            child.prettyPrint(out, childIndent);
+        }
+
+        for (; artefactIndex < codeFragments.size(); ++artefactIndex) {
+            codeFragments.get(artefactIndex).prettyPrint(out, indent);
+        }
+    }
+
+    public void prettyPrint(PrintStream out) {
+        prettyPrint(out, "");
+    }
+}

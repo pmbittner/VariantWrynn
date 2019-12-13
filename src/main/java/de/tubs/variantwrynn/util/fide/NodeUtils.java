@@ -9,8 +9,17 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import org.prop4j.Not;
 
 public class NodeUtils {
+    public static Node negate(Node node) {
+        if (node instanceof Literal) {
+            return negate((Literal) node);
+        }
+
+        return new Not(node);
+    }
+
     public static Literal negate(Literal lit) {
         if (lit == null || lit.var == null) {
             throw new NullPointerException();
@@ -76,6 +85,12 @@ public class NodeUtils {
 
     public static Node createTrue() {
         return reference(Boolean.TRUE);
+    }
+
+    public static String toString(Node node) {
+        if (node != null)
+            return node.toString();
+        return "True";
     }
 }
 
