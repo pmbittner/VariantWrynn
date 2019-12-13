@@ -1,5 +1,7 @@
 package de.tubs.variantwrynn.cppklaus;
 
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.tubs.variantwrynn.util.fide.ConfigurationUtils;
 import de.tubs.variantwrynn.util.fide.NodeUtils;
 import org.prop4j.And;
 import org.prop4j.Node;
@@ -97,6 +99,24 @@ public class FeatureTrace {
         }
     }
 
+    public FeatureTrace toVariant(final Configuration configuration) {
+        // If this trace does not satisfy the given configuration, we can cut the entire subtree.
+        if (this.getFormula() == null || ConfigurationUtils.isSatisfyingAssignment(configuration, this.getFormula())) {
+            FeatureTrace variant = this.cloneShallow();
+
+            for (FeatureTrace child : children) {
+                FeatureTrace childVariant = child.toVariant(configuration);
+                if (childVariant != null) {
+                    variant.addChild(childVariant);
+                }
+            }
+
+            return variant;
+        }
+
+        return null;
+    }
+
     public boolean isConjunctiveNormalForm() {
         Node me = getFormula();
 
@@ -135,5 +155,24 @@ public class FeatureTrace {
 
     public void prettyPrint(PrintStream out) {
         prettyPrint(out, "");
+    }
+
+    public FeatureTrace cloneShallow() {
+        FeatureTrace copy = new FeatureTrace();
+        Node myFormula = this.formula;
+        copy.formula = myFormula == null ? null : myFormula.clone();
+        // We do not have to clone the fragments as they are const and should stay unique.
+        copy.codeFragments.addAll(this.codeFragments);
+        return copy;
+    }
+
+    public FeatureTrace cloneDeep() {
+        FeatureTrace copy = cloneShallow();
+
+        for (FeatureTrace child : this.children) {
+            copy.addChild(child.cloneDeep());
+        }
+
+        return copy;
     }
 }

@@ -3,6 +3,7 @@ package de.tubs.variantwrynn.util.fide;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.tubs.variantwrynn.util.Bits;
 import org.prop4j.Node;
 
@@ -39,5 +40,13 @@ public class ConfigurationUtils {
     public static List<Bits> getValidConfigurationsOf(IFeatureModel fm, List<String> featureOrder) {
         // FIXME: Not implemented
         return new ArrayList<>(0);
+    }
+
+    public static Configuration toConfiguration(IFeatureModel featureModel, List<String> activeFeatures) {
+        Configuration configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_PROPAGATE);
+        for (String activeFeature : activeFeatures) {
+            configuration.setManual(activeFeature, Selection.SELECTED);
+        }
+        return configuration;
     }
 }

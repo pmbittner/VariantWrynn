@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import de.tubs.variantwrynn.util.fide.NodeUtils;
 
-public class CPP2MHParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
+public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
     private final static String AND = "&&";
     private final static String OR = "||";
 
@@ -26,7 +26,7 @@ public class CPP2MHParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
 
     private final boolean ignoreEmptyCode = true;
 
-    public CPP2MHParser() {
+    public FeatureTraceParser() {
         initialize();
         reset(null);
     }

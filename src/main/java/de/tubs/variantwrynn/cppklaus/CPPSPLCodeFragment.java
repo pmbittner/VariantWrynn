@@ -5,12 +5,12 @@ import de.tubs.variantwrynn.core.model.Artefact;
 import java.io.PrintStream;
 
 public class CPPSPLCodeFragment implements Artefact, Comparable<CPPSPLCodeFragment> {
-    private String text;
+    private final String text;
 
     /**
      * Index in a totally ordered list where the complete list represents the entire SPL.
      */
-    private int location;
+    private final int location;
 
     public CPPSPLCodeFragment(String text, int location) {
         this.text = text;

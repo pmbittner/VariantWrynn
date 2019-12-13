@@ -2,6 +2,7 @@ package de.tubs.variantwrynn.cppklaus;
 
 import antlr.cpp.CPPLexer;
 import antlr.cpp.CPPParser;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -15,7 +16,7 @@ public class CPPSPL {
     private String name;
     private List<File> sourceFiles;
     private FeatureTrace featureTrace;
-    private FeatureModel featureModel;
+    private IFeatureModel featureModel;
 
     public CPPSPL(String name) {
         this.name = name;
@@ -23,11 +24,12 @@ public class CPPSPL {
     }
 
     public boolean addSourceFile(File file) {
+        System.out.println("[CPPSPL.addSourceFile] " + file);
         return sourceFiles.add(file);
     }
 
     public FeatureTrace processSourceFiles() {
-        CPP2MHParser cpp2mh = new CPP2MHParser();
+        FeatureTraceParser cpp2mh = new FeatureTraceParser();
         FeatureTrace root = new FeatureTrace();
 
         for (File srcFile : sourceFiles) {
@@ -50,5 +52,17 @@ public class CPPSPL {
         }
 
         return featureTrace = root;
+    }
+
+    public FeatureTrace getFeatureTrace() {
+        return featureTrace;
+    }
+
+    public void setFeatureModel(IFeatureModel fm) {
+        this.featureModel = fm;
+    }
+
+    public IFeatureModel getFeatureModel() {
+        return this.featureModel;
     }
 }

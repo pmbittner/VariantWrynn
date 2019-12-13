@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+    <properties/>
+    <struct>
+        <and abstract="true" mandatory="true" name="Root">
+            <and mandatory="true" name="SDSORT_USES_RAM">
+                <feature name="SDSORT_DYNAMIC_RAM"/>
+            </and>
+            <feature name="SDSORT_CACHE_NAMES"/>
+            <feature name="SDSORT_USES_STACK"/>
+            <feature name="HAS_FOLDER_SORTING"/>
+        </and>
+    </struct>
+    <constraints/>
+    <calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+    <comments/>
+    <featureOrder userDefined="false"/>
+</featureModel>

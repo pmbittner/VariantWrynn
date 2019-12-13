@@ -19,7 +19,7 @@ public class IO {
     }
 
     public static IFeatureModel loadFile(String path) {
-        IFeatureModel fm = FeatureModelCreation.createFeatureModel();
+        IFeatureModel fm = FeatureModelUtils.createFeatureModel();
         SimpleFileHandler.load(Paths.get(path), fm, FMFormatManager.getInstance());
         return fm;
     }
