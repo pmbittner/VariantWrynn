@@ -47,7 +47,7 @@ public class Main {
                     }
                 } else if (arg.startsWith(FMPrefix)) {
                     if (fm == null) {
-                        fm = IO.loadFile(arg.substring(FMPrefix.length()));
+                        fm = IO.loadFeatureModel(arg.substring(FMPrefix.length()));
                     } else {
                         warnAboutDuplicateSpecificationOf("feature model");
                     }
@@ -56,7 +56,7 @@ public class Main {
                         String fmPath = arg.substring(FMInResourcesPrefix.length());
                         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                         File file = FileUtils.toFile(Objects.requireNonNull(classLoader.getResource(fmPath)));
-                        fm = IO.loadFile(file.getAbsolutePath());
+                        fm = IO.loadFeatureModel(file.getAbsolutePath());
                     } else {
                         warnAboutDuplicateSpecificationOf("feature model");
                     }
@@ -111,7 +111,7 @@ public class Main {
         trace.prettyPrint(System.out);
         System.out.println("CNF: " + trace.isConjunctiveNormalForm());
 
-        int numVariants = 1;
+        int numVariants = 4;
         IFeatureModel fm = project.getFeatureModel();
         if (fm != null) {
             RandomConfigurationGenerator configurationGenerator =
@@ -131,7 +131,7 @@ public class Main {
                 FeatureTrace variant = trace.toVariant(config);
 
                 System.out.println("Variant " + selectedFeatures + " =============================");
-                variant.prettyPrint(System.out);
+                System.out.println(variant.getCode());
                 System.out.println();
             }
         }

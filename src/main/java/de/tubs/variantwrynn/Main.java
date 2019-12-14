@@ -35,7 +35,7 @@ public class Main {
         final String fName_Comment = "Comment";
 
         String fmFile = DefaultResourceDirectory + "/fm/DumbPL.xml";
-        IFeatureModel globalFM = IO.loadFile(fmFile);
+        IFeatureModel globalFM = IO.loadFeatureModel(fmFile);
 
         List<GroundTruthArtefact<String>> A = new ArrayList<>();
         {

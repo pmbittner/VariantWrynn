@@ -18,13 +18,13 @@ public class IO {
         return new File(path).exists();
     }
 
-    public static IFeatureModel loadFile(String path) {
+    public static IFeatureModel loadFeatureModel(String path) {
         IFeatureModel fm = FeatureModelUtils.createFeatureModel();
         SimpleFileHandler.load(Paths.get(path), fm, FMFormatManager.getInstance());
         return fm;
     }
 
-    public static boolean writeFile(String path, IFeatureModel model, boolean overwrite) {
+    public static boolean writeFeatureModel(String path, IFeatureModel model, boolean overwrite) {
         if (fileExists(path) && !overwrite)
             return false;
 
@@ -49,8 +49,8 @@ public class IO {
         return true;
     }
 
+    /*
     public static boolean writeFile(String path, Configuration configuration, boolean overwrite) {
-
         return false;
-    }
+    }//*/
 }

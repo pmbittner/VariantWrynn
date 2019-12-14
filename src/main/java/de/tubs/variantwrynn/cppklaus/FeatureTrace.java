@@ -132,6 +132,28 @@ public class FeatureTrace {
         return false;
     }
 
+    public String getCode() {
+        StringBuilder string = new StringBuilder();
+
+        int artefactIndex = 0;
+        for (FeatureTrace child : children) {
+            final int childLocation = child.getLocationBegin();
+
+            while (artefactIndex < codeFragments.size() && codeFragments.get(artefactIndex).getLocation() < childLocation) {
+                string.append(codeFragments.get(artefactIndex).getText()).append("\n");
+                ++artefactIndex;
+            }
+
+            string.append(child.getCode());
+        }
+
+        for (; artefactIndex < codeFragments.size(); ++artefactIndex) {
+            string.append(codeFragments.get(artefactIndex).getText()).append("\n");
+        }
+
+        return string.toString();
+    }
+
     private void prettyPrint(PrintStream out, String indent) {
         out.println(indent + "{" + NodeUtils.toString(this.formula) + "}");
 
