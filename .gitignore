@@ -15,3 +15,6 @@ buildNumber.properties
 # CLion
 .idea
 *.iml
+
+# generated code
+genvariants/

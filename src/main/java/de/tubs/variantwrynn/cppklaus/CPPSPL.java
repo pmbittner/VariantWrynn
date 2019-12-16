@@ -3,7 +3,7 @@ package de.tubs.variantwrynn.cppklaus;
 import antlr.cpp.CPPLexer;
 import antlr.cpp.CPPParser;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -14,48 +14,48 @@ import java.util.ArrayList;
 
 public class CPPSPL {
     private String name;
-    private List<File> sourceFiles;
-    private FeatureTrace featureTrace;
+    private List<CPPFile> sourceFiles;
     private IFeatureModel featureModel;
+    private boolean finalised;
 
-    public CPPSPL(String name) {
+    public CPPSPL(String name, IFeatureModel featureModel, List<CPPFile> sourceFiles) {
         this.name = name;
-        this.sourceFiles = new ArrayList<>();
+        this.featureModel = featureModel;
+        this.sourceFiles = sourceFiles;
+        this.finalised = false;
     }
 
-    public boolean addSourceFile(File file) {
+    public boolean addSourceFile(CPPFile file) {
+        if (finalised) {
+            System.out.println("[CPPSPL.addSourceFile] Cannot add source file \"" + file + "\" because the project is already finalised!");
+            return false;
+        }
+
         System.out.println("[CPPSPL.addSourceFile] " + file);
         return sourceFiles.add(file);
     }
 
-    public FeatureTrace processSourceFiles() {
-        FeatureTraceParser cpp2mh = new FeatureTraceParser();
-        FeatureTrace root = new FeatureTrace();
+    public void processSourceFiles() {
+        CPPAnnotatedCodeParser cpp = new CPPAnnotatedCodeParser();
 
-        for (File srcFile : sourceFiles) {
-            FeatureTrace scrFileHierarchy = new FeatureTrace();
-            scrFileHierarchy.addArtefact(new CPPSPLCodeFragment(srcFile.getPath(), -1));
-            root.addChild(scrFileHierarchy);
-
-            cpp2mh.reset(scrFileHierarchy);
+        for (CPPFile srcFile : sourceFiles) {
+            FeatureAnnotation<String> annotation = new FeatureAnnotation<>();
+            srcFile.setContent(annotation);
+            cpp.reset(annotation);
 
             ANTLRFileStream antlrInput = null;
             try {
-                antlrInput = new ANTLRFileStream(srcFile.getAbsolutePath());
+                antlrInput = new ANTLRFileStream(srcFile.getFile().getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            CPPLexer l = new CPPLexer(antlrInput);
-            CPPParser p = new CPPParser(new CommonTokenStream(l));
-            cpp2mh.visitDocument(p.document());
+            CPPLexer lexer = new CPPLexer(antlrInput);
+            CPPParser parser = new CPPParser(new CommonTokenStream(lexer));
+            cpp.visitDocument(parser.document());
         }
 
-        return featureTrace = root;
-    }
-
-    public FeatureTrace getFeatureTrace() {
-        return featureTrace;
+        finalised = true;
     }
 
     public void setFeatureModel(IFeatureModel fm) {
@@ -64,5 +64,15 @@ public class CPPSPL {
 
     public IFeatureModel getFeatureModel() {
         return this.featureModel;
+    }
+
+    public CPPVariant toVariant(Configuration configuration) {
+        List<CPPFile> code = new ArrayList<>(this.sourceFiles.size());
+
+        for (CPPFile file : this.sourceFiles) {
+            code.add(file.toVariant(configuration));
+        }
+
+        return new CPPVariant(code, configuration);
     }
 }

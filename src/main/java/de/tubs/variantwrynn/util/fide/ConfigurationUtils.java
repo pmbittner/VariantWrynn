@@ -2,6 +2,7 @@ package de.tubs.variantwrynn.util.fide;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.tubs.variantwrynn.util.Bits;
@@ -11,6 +12,10 @@ import java.util.*;
 
 public class ConfigurationUtils {
     public static boolean isSatisfyingAssignment(Configuration config, Node formula) {
+        if (config == null) {
+            return true;
+        }
+
         Map<Object, Boolean> assignment = new HashMap<>();
 
         for (IFeature f : config.getFeatureModel().getFeatures()) {
@@ -48,5 +53,15 @@ public class ConfigurationUtils {
             configuration.setManual(activeFeature, Selection.SELECTED);
         }
         return configuration;
+    }
+
+    public static String toShortName(Configuration configuration) {
+        StringBuilder name = new StringBuilder();
+
+        for (IFeature f : configuration.getSelectedFeatures()) {
+            name.append("__").append(f.getName());
+        }
+
+        return name.toString();
     }
 }

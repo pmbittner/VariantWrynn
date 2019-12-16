@@ -63,10 +63,22 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/featureide3_5_5/org.sat4j.pb.jar</systemPath>
         </dependency>
+
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
             <version>4.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.gumtreediff</groupId>
+            <artifactId>core</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.gumtreediff</groupId>
+            <artifactId>client</artifactId>
+            <version>2.1.2</version>
         </dependency>
     </dependencies>
 </project>

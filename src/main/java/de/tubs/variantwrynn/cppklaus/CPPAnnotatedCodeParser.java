@@ -13,11 +13,11 @@ import java.util.function.Function;
 
 import de.tubs.variantwrynn.util.fide.NodeUtils;
 
-public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
+public class CPPAnnotatedCodeParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
     private final static String AND = "&&";
     private final static String OR = "||";
 
-    private FeatureTrace currentRoot, current;
+    private FeatureAnnotation<String> currentRoot, current;
     private int ArtefactPos = 0;
     private Map<String, Function<List<Node>, Literal>> functionMacros;
 
@@ -26,12 +26,12 @@ public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
 
     private final boolean ignoreEmptyCode = true;
 
-    public FeatureTraceParser() {
+    public CPPAnnotatedCodeParser() {
         initialize();
         reset(null);
     }
 
-    public void reset(FeatureTrace hierarchy) {
+    public void reset(FeatureAnnotation<String> hierarchy) {
         currentRoot = hierarchy;
         current = currentRoot;
         currentNegatedConditions.clear();
@@ -46,8 +46,8 @@ public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
         });
     }
 
-    private FeatureTrace push() {
-        FeatureTrace newTrace = new FeatureTrace();
+    private FeatureAnnotation<String> push() {
+        FeatureAnnotation<String> newTrace = new FeatureAnnotation<>();
         current.addChild(newTrace);
         current = newTrace;
         return newTrace;
@@ -72,8 +72,8 @@ public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
     }
 
     private Node handleCondition(ParserRuleContext ctx, Node condition, Node presenceCondition, int childOffset) {
-        FeatureTrace myTrace = push();
-        myTrace.setFormula(presenceCondition);
+        FeatureAnnotation<String> myTrace = push();
+        myTrace.setAnnotation(presenceCondition);
 
         currentNegatedConditions.add(NodeUtils.negate(condition));
 
@@ -117,8 +117,8 @@ public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
     public Node visitElseCondition(CPPParser.ElseConditionContext ctx) {
         // Pop the trace of the previous condition and push our own.
         pop();
-        FeatureTrace myTrace = push();
-        myTrace.setFormula(new And(currentNegatedConditions.toArray()));
+        FeatureAnnotation<String> myTrace = push();
+        myTrace.setAnnotation(new And(currentNegatedConditions.toArray()));
 
         // to obtain the text
         for (int i = 0; i < ctx.getChildCount(); ++i) {
@@ -127,7 +127,7 @@ public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
 
         pop();
 
-        return myTrace.getFormula(); // null represents true
+        return myTrace.getAnnotation(); // null represents true
     }
 
     @Override
@@ -142,8 +142,6 @@ public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
 
     @Override
     public Node visitExpression(CPPParser.ExpressionContext ctx) {
-        String t = ctx.getText();
-
         if (ctx.braces() != null) {
             return visitBraces(ctx.braces());
         }
@@ -212,7 +210,7 @@ public class FeatureTraceParser extends antlr.cpp.CPPParserBaseVisitor<Node> {
     public Node visitCodeline(@NotNull CPPParser.CodelineContext ctx) {
         String code = ctx.getText();
         if (!ignoreEmptyCode || !code.replaceAll("[\\r\\n]+\\s*", "").trim().isEmpty()) {
-            current.addArtefact(new CPPSPLCodeFragment(ctx.getText(), ArtefactPos));
+            current.addArtefact(new AlignedArtefact<>(ctx.getText(), ArtefactPos));
             ++ArtefactPos;
         }
         return super.visitCodeline(ctx);
