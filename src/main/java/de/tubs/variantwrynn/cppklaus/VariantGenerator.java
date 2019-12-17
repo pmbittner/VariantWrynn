@@ -65,7 +65,7 @@ public class VariantGenerator {
 
             outputDirectory = FileUtils.getOrCreateDir(outputDirectoryStr.get());
             if (!outputDirectory.isAbsolute()) {
-                String workingDirectory = System.getProperty("user.dir");
+                String workingDirectory = FileUtils.getWorkingDirectory();
                 outputDirectory = new File(workingDirectory, outputDirectoryStr.get());
             }
 
@@ -96,10 +96,12 @@ public class VariantGenerator {
             FileUtils.deleteDirectory(outputDirectory, "genvariants");
 
             List<List<String>> configs = configurationGenerator.getConfigurations();
+            int id = 0;
             for (List<String> selectedFeatures : configs) {
                 Configuration config = ConfigurationUtils.toConfiguration(featuremodel, selectedFeatures);
                 CPPVariant variant = project.toVariant(config);
-                variant.storeAt(outputDirectory);
+                variant.storeAt(FileUtils.getOrCreateDir(new File(outputDirectory, "Variant" + id)));
+                ++id;
             }
         }
 

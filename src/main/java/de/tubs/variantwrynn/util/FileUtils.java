@@ -103,4 +103,8 @@ public class FileUtils {
         }
         return directory.delete();
     }
+
+    public static String getWorkingDirectory() {
+        return System.getProperty("user.dir");
+    }
 }

@@ -1,5 +1,6 @@
 package de.tubs.variantwrynn.cppklaus;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.tubs.variantwrynn.core.model.Artefact;
 import de.tubs.variantwrynn.core.model.Variant;
@@ -33,12 +34,16 @@ public class CPPVariant implements Variant {
         return configuration;
     }
 
-    public void storeAt(File absoluteOutputPath) {
-        File outPath = new File(absoluteOutputPath.toString(), "Variant_" + ConfigurationUtils.toShortName(configuration));
-        FileUtils.getOrCreateDir(outPath);
-
+    public void storeAt(File outputDir) {
         for (CPPFile cppfile : sourceFiles) {
-            cppfile.storeAt(outPath);
+            cppfile.storeAt(outputDir);
         }
+
+        // Write config
+        StringBuilder configText = new StringBuilder();
+        for (IFeature f : configuration.getSelectedFeatures()) {
+            configText.append(f).append("\n");
+        }
+        FileUtils.writeText(FileUtils.getOrCreate(new File(outputDir, "config.txt")), configText.toString());
     }
 }
