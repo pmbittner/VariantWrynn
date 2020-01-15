@@ -12,6 +12,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import org.prop4j.Not;
 
 public class NodeUtils {
+    public static Node True = null;
+
     public static Node negate(Node node) {
         if (node instanceof Literal) {
             return negate((Literal) node);
@@ -60,6 +62,16 @@ public class NodeUtils {
         return new Literal(object, positive);
     }
 
+    public static Node AndSimplified(Node a, Node b) {
+        if (a == True) {
+            return b;
+        } else if (b == True) {
+            return a;
+        }
+
+        return new And(a, b);
+    }
+
     /**
      * This method inlines all recursive Ands into the top level And, passed as argument.
      */
@@ -81,10 +93,6 @@ public class NodeUtils {
                 }
             }
         } while (!redundantChildren.isEmpty());
-    }
-
-    public static Node createTrue() {
-        return reference(Boolean.TRUE);
     }
 
     public static String toString(Node node) {
