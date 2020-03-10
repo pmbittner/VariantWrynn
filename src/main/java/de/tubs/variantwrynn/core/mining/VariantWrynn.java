@@ -54,12 +54,14 @@ public class VariantWrynn {
         List<Bits> v_dc;
 
         // If v_bot is not empty, i.e., there is at least one variant not containing a,
-        // a cannot be mapped to any mandatory feature.
+        // a cannot be mapped to any core feature.
         if (vsProject.getVariants().stream().anyMatch(v -> !v.contains(a))) {
             for (IFeature f : fm.getFeatures()) {
+                // FIXME: Has to be core instead of mandatory!
+                /*
                 if (f.getStructure().isMandatory()) {
                     featureOrder.remove(f.getName());
-                }
+                }//*/
             }
         }
 

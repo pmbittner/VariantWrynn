@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class FileUtils {
     public static File getOrCreateDir(File path) {
-        if (!path.exists()) {
+        if (path != null && !path.exists()) {
             getOrCreateDir(path.getParentFile());
             path.mkdirs();
             assert path.exists();
