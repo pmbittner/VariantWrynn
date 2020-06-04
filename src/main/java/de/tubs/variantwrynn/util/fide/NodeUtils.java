@@ -48,6 +48,7 @@ public class NodeUtils {
             return reference(((IFeature) object).getName());
         }
 
+        // Object.toString()?
         return new Literal(object);
     }
 

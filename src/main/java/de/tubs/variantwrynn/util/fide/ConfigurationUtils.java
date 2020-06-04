@@ -29,6 +29,14 @@ public class ConfigurationUtils {
         return formula.getValue(assignment);
     }
 
+    public static Configuration toConfiguration(IFeatureModel featureModel, List<String> activeFeatures) {
+        Configuration configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_PROPAGATE);
+        for (String activeFeature : activeFeatures) {
+            configuration.setManual(activeFeature, Selection.SELECTED);
+        }
+        return configuration;
+    }
+
     public static Bits toAssignment(Configuration config, List<String> featureOrder) {
         final Set<String> selectedFeatures = config.getSelectedFeatureNames();
         Bits assignment = new Bits(featureOrder.size());
@@ -45,14 +53,6 @@ public class ConfigurationUtils {
     public static List<Bits> getValidConfigurationsOf(IFeatureModel fm, List<String> featureOrder) {
         // FIXME: Not implemented
         return new ArrayList<>(0);
-    }
-
-    public static Configuration toConfiguration(IFeatureModel featureModel, List<String> activeFeatures) {
-        Configuration configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_PROPAGATE);
-        for (String activeFeature : activeFeatures) {
-            configuration.setManual(activeFeature, Selection.SELECTED);
-        }
-        return configuration;
     }
 
     public static String toShortName(Configuration configuration) {
