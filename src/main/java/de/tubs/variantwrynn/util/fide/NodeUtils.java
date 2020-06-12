@@ -12,6 +12,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import org.prop4j.Not;
 
 public class NodeUtils {
+    // FeatureIDE does not support True and False... or does it? Chico and me didn't know.
     public static Node True = null;
 
     public static Node negate(Node node) {
@@ -42,9 +43,11 @@ public class NodeUtils {
 
     public static Literal reference(Object object) {
         if (object instanceof Literal) {
+            // Careful: Dont put literals into literals!
             return referenceLiteral((Literal) object);
         }
         if (object instanceof IFeature) {
+            // Careful: Use name as string here!
             return reference(((IFeature) object).getName());
         }
 

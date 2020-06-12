@@ -16,13 +16,17 @@ public class ConfigurationUtils {
             return true;
         }
 
+        // TODO: Use Analyzer.isValid and canBeValid
+
         Map<Object, Boolean> assignment = new HashMap<>();
 
         for (IFeature f : config.getFeatureModel().getFeatures()) {
+            // Put name in map although formula.getValue expects Map<OBJECT, Boolean>.
             assignment.put(f.getName(), false);
         }
 
         for (IFeature f : config.getSelectedFeatures()) {
+            // Put name in map although formula.getValue expects Map<OBJECT, Boolean>.
             assignment.put(f.getName(), true);
         }
 
@@ -37,6 +41,7 @@ public class ConfigurationUtils {
         return configuration;
     }
 
+    // LiteralSet
     public static Bits toAssignment(Configuration config, List<String> featureOrder) {
         final Set<String> selectedFeatures = config.getSelectedFeatureNames();
         Bits assignment = new Bits(featureOrder.size());
@@ -49,6 +54,8 @@ public class ConfigurationUtils {
 
         return assignment;
     }
+
+    /// IGNORE THE FOLLOWING
 
     public static List<Bits> getValidConfigurationsOf(IFeatureModel fm, List<String> featureOrder) {
         // FIXME: Not implemented

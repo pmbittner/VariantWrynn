@@ -55,6 +55,7 @@ public class VariantWrynn {
 
         // If v_bot is not empty, i.e., there is at least one variant not containing a,
         // a cannot be mapped to any core feature.
+        // -> But cant it be an interaction in theory? CoreFeature and SomeOtherNonCoreFeature?
         if (vsProject.getVariants().stream().anyMatch(v -> !v.contains(a))) {
             for (IFeature f : fm.getFeatures()) {
                 // FIXME: Has to be core instead of mandatory!

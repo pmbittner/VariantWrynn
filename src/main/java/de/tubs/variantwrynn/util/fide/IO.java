@@ -14,9 +14,6 @@ import java.io.File;
 import java.nio.file.Paths;
 
 public class IO {
-    public static boolean fileExists(String path) {
-        return new File(path).exists();
-    }
 
     public static IFeatureModel loadFeatureModel(String path) {
         IFeatureModel fm = FeatureModelUtils.createFeatureModel();
@@ -47,6 +44,12 @@ public class IO {
         }
 
         return true;
+    }
+
+    /// IGNORE THE FOLLOWING
+
+    public static boolean fileExists(String path) {
+        return new File(path).exists();
     }
 
     /*
